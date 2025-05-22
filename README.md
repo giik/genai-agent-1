@@ -11,8 +11,9 @@ Google Gemini so I asked myself: "how difficult could it be to borrow
 the code and twist it to work with the Google API?" Well, it took
 longer than I expected but I'm still giving myself credit for doing it
 in a less than a day after not having written any Go for about 10
-years, and, having zero familiarity with the Google Gemini API
-Libraries, incl. the Go version.
+years, and, having zero familiarity with the Google [Gemini API
+Libraries](https://ai.google.dev/gemini-api/docs/libraries), incl. the
+Go version.
 
 
 What are we making here: a command-line tool that connects
@@ -23,7 +24,11 @@ to Gemini and allows it to edit code on our (the client) side.
 You gotta have Go on your system and that's easy to achieve. Follow
 the instructions on [Go installation](https://go.dev/doc/install) for
 your platform. If you have an older version-as I did-just uninstall it
-by following the Uninstalling Go guide.  Next, head up to Google's [AI
+by following the [Uninstalling
+Go](https://go.dev/doc/manage-install#uninstalling) guide, then
+reinstall the newest version.
+
+Next, head to Google's [AI
 Studio](https://aistudio.google.com/app/apikey) and get an API
 key. Click on the Create API Key button in the top right corner, then
 click in the Search Google Cloud projects field of the popup (I didn't
@@ -37,17 +42,9 @@ picked up from the environment (so you don't have to&mdash;and you do
 **not** want to&mdash;hardcode it into the program). I used
 `GOOGLE_API_KEY` for the environment variable name and it works.
 
-Create an empty directory for the code, *e.g.,* `code-agent`, and
-initialize it:
-
-```bash
-mkdir code-agent
-cd code-agent
-go mod init agent
-touch main.go
-```
-
-Once you've made some edits, you can build everything and run it using:
+Clone the [repo at
+github.com/giik/genai-agent-1](https://github.com/giik/genai-agent-1). To
+build and run the code use the following command:
 
 ```bash
 go build ./... && ./agent
@@ -55,20 +52,21 @@ go build ./... && ./agent
 
 ## Notes
 
-Again, this uses the Google GenAI API from `google.golang.org/genai`
-so we just need to import this. Similar to Anthropic, the GenAI API
-provides for multiturn conversations with tool/function calling.
+Again, this code uses the Google GenAI API from
+`google.golang.org/genai` so we just need to import it. Similar to
+Anthropic, the GenAI API provides for multi-turn conversations with
+tool/function calling.
 
 The idea is very elegant and there is an excellent, [easily
 understandable description (picture
 included)](https://ai.google.dev/gemini-api/docs/function-calling?example=meeting#how_function_calling_works)
-in the Gemini API docs. In short, we request to the server (from out
-client) includes not only the prompt but also the function
-definitions. Gemini can decide to answer with a Text response, or,
-with a "function call" to one of the tools we've made available. Then,
-it is our responsibility to run the tool-client side-and forward any
-output back to the server, which send back its final answer. Very
-ingenious!
+in the Gemini API docs. In short, the system prompt (sent to the model
+from our client at the start of the session) includes the definitions
+of the available functions/tools.  The model can decide to answer with
+a Text response, or, with a "function call" to one of the tools we've
+made available. Then, it is our responsibility to run the tool-client
+side-and forward any output back to the model, which send back its
+final answer. Very ingenious!
 
 To tie it all together, we need a few pieces:
 
@@ -83,12 +81,12 @@ forwarding outputs to Gemini.
 
 Also, note that on every turn we send to the model a single text part
 or one or more responses to the Function Call requests. The server is
-stateless, so the actual requests to it must carry the context it
-needs -- typically, all turns in the conversation so far -- but this
-is handled by the API, not out client code.  I am guessing there is
-some point where the context becomes too large and gets truncated but
-thsi is just a wild guess, I don't really know and haven't yet
-inspected the GenAI GO API code to see whether it actually does that.
+stateless, so the actual requests to it must carry the context the
+model needs -- typically, all turns in the conversation so far -- but
+this is handled by the API, not our client code.  I am guessing there
+is some point where the context becomes too large and gets truncated
+but this is just a wild guess, I don't really know and haven't yet
+inspected the GenAI Go code to see whether it actually does that.
 
 ## Logging 
 
@@ -130,10 +128,18 @@ I recorded a session (see the included file
 create a fizzbuzz Swift program, then edit it to change how far it's
 going (the program is included).  This worked great. Similarly, it was
 able to create a functional SwiftUI view (included) of a
-timer/clock). Finally, because I couldn't help myself I did ask it to
+timer/clock. Finally, because I couldn't help myself I did ask it to
 read its code (all Go files in the current directory) and write its
 own markdown documentation. I've included it without changes, it's not
 at all bad.
+
+## About Go
+
+The last time I wrote a relatively complex server project in Go (or
+any code in Go) was about 2017. It was a nice break from the daily C++
+at work and whatever other hobbies at home. It came back to me in a
+jiffy but I ask the more experienced Gophers out there to forgive me
+for any non-idiomatic use or otherwise unorthodox style.
 
 Enjoy!
 

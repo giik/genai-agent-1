@@ -15,14 +15,14 @@ func LogFileOrNil(logname string) *os.File {
 	const tmpDirname = "/tmp"
 	dirname, exists := os.LookupEnv(logDirEnv)
 	if !exists || len(dirname) == 0 {
-		redf("environment '%s' absent or set to empty string, using %s instead", logDirEnv, tmpDirname)
+		redf("environment '%s' absent or set to empty string, using %s instead\n", logDirEnv, tmpDirname)
 		dirname = tmpDirname
 	}
 
 	path := filepath.Join(dirname, logname)
 	f, err := os.Create(path)
 	if err != nil {
-		redln("unable to open '%s' for writing", path)
+		redf("unable to open '%s' for writing (does it exist? if yes, is it writeable?)\n", path)
 		return nil
 	}
 	return f
